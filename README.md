@@ -37,7 +37,7 @@ Turn your Spring Boot services into portable containers and orchestrate them wit
 * Add a healthcheck section in `docker-compose.yml`.
 * Configure service dependencies (`depends_on`) with health conditions.
 #### Constraints
-* Keep Dockerfiles minimal, start from `eclipse-temurin:17-jdk` or similar.
+* Keep Dockerfiles minimal, start from `eclipse-temurin:25-jdk` or similar.
 * Avoid bloated images or unnecessary tools.
 * Prefer convention over manual scripting where possible.
 #### What to Deliver

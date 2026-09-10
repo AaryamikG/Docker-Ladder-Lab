@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: appdb
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - ladder-net
+
+  catalog-service:
+    build: ./catalog-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/appdb
+      SPRING_DATASOURCE_USERNAME: app
+      SPRING_DATASOURCE_PASSWORD: secret
+    ports:
+      - "8081:8080"
+    depends_on:
+      - postgres
+    networks:
+      - ladder-net
+
+  orders-service:
+    build: ./orders-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/appdb
+      SPRING_DATASOURCE_USERNAME: app
+      SPRING_DATASOURCE_PASSWORD: secret
+      CATALOG_SERVICE_URL: http://catalog-service:8080
+    ports:
+      - "8082:8080"
+    depends_on:
+      - postgres
+      - catalog-service
+    networks:
+      - ladder-net
+
+volumes:
+  postgres_data:
+
+networks:
+  ladder-net:
+    driver: bridge

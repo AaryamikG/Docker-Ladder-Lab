@@ -55,21 +55,10 @@ Turn your Spring Boot services into portable containers and orchestrate them wit
 
 ## Running it
 
-#### Build & run
 ```
 docker compose up --build
 ```
-This builds the `catalog-service` and `orders-service` images from their Dockerfiles and starts them alongside a Postgres container — one command, full system.
 
-Other useful commands:
-```
-docker compose build      # build images without starting containers
-docker compose up -d      # start in the background
-docker compose down       # stop and remove containers
-docker compose down -v    # also remove the postgres_data volume (wipes DB data)
-```
-
-#### Verify the endpoints
 ```
 curl http://localhost:8081/api/catalog/items
 curl http://localhost:8081/api/catalog/database
@@ -77,9 +66,3 @@ curl http://localhost:8082/api/orders
 curl http://localhost:8082/api/orders/catalog-items
 curl http://localhost:8082/api/orders/database
 ```
-`orders/catalog-items` calls out to catalog-service over the internal Docker network and proxies its response, so a successful response there confirms both services and their networking are working end-to-end.
-
-#### Network & volume setup
-All three containers (`postgres`, `catalog-service`, `orders-service`) join a user-defined bridge network, `ladder-net`. On a user-defined network, Docker's embedded DNS resolves each service by its Compose service name, so `orders-service` reaches Postgres at `postgres:5432` and calls catalog-service at `http://catalog-service:8080` — no hardcoded IPs, no host networking. Externally, only `catalog-service` (8081), `orders-service` (8082), and `postgres` (5432, for local debugging) are published to the host.
-
-Postgres data is persisted in the named volume `postgres_data`, mounted at `/var/lib/postgresql/data` inside the container. Because the volume is named (not bound to the container's writable layer), the database survives `docker compose down` / container recreation and is only removed if you explicitly run `docker compose down -v`.
